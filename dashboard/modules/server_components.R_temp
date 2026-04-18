@@ -1,0 +1,218 @@
+  # --- Ranking Dinámico (Top 10 vs Emergentes) ---
+  output$plot_ranking_dinamico <- renderPlotly({
+    req(input$tipo_analisis_maestro)
+    df <- datos_periodo()
+    paises <- paises_validos()
+    
+    if (input$tipo_analisis_maestro == "top") {
+      totales_pais <- sort(colSums(df[, paises, drop = FALSE], na.rm = TRUE), decreasing = TRUE)
+      top10 <- head(totales_pais, 10)
+      df_plot <- data.frame(Pais = names(top10), Val = as.numeric(top10), stringsAsFactors = FALSE)
+      title_x <- "Total Llegadas"
+      hover_suffix <- " llegadas"
+    } else {
+      # Logica de emergentes
+      n_meses <- as.integer(input$periodo_analitica)
+      df_completo <- data$nacionalidad
+      fecha_max <- max(df_completo$Fecha, na.rm = TRUE)
+      fecha_corte_actual <- fecha_max %m-% months(n_meses)
+      fecha_corte_previo <- fecha_corte_actual %m-% months(n_meses)
+      
+      df_actual <- df_completo %>% dplyr::filter(Fecha > fecha_corte_actual)
+      df_previo <- df_completo %>% dplyr::filter(Fecha > fecha_corte_previo & Fecha <= fecha_corte_actual)
+      
+      suma_actual <- colSums(df_actual[, paises, drop = FALSE], na.rm = TRUE)
+      suma_previo <- colSums(df_previo[, paises, drop = FALSE], na.rm = TRUE)
+      
+      validos <- names(suma_actual)[suma_actual > 100 & suma_previo > 0]
+      variacion <- ((suma_actual[validos] - suma_previo[validos]) / suma_previo[validos]) * 100
+      # Filtrar solo crecimientos positivos para el analisis de "Emergentes"
+      variacion <- variacion[variacion > 0]
+      top10_emerge <- head(sort(variacion, decreasing = TRUE), 10)
+      
+      df_plot <- data.frame(Pais = names(top10_emerge), Val = as.numeric(top10_emerge), stringsAsFactors = FALSE)
+      title_x <- "Crecimiento (%)"
+      hover_suffix <- "%"
+    }
+    
+    if (nrow(df_plot) == 0) return(empty_plotly("No hay datos para mostrar"))
+    df_plot$Continente <- get_continente(df_plot$Pais)
+    
+    plot_ly() %>%
+      add_bars(data = df_plot, x = ~Val, y = ~Pais, orientation = "h",
+               marker = list(color = COLORES_CONTINENTE[df_plot$Continente]),
+               hovertext = ~paste0("<b>", Pais, "</b><br>", fmt_num(Val), hover_suffix),
+               hoverinfo = "text", showlegend = FALSE) %>%
+      layout_dashboard(
+        xaxis = list(title = title_x, 
+                     range = c(0, max(df_plot$Val) * 1.1), # Comienza en 0
+                     tickformat = if(input$tipo_analisis_maestro == "top") ",.0f" else ".1f"),
+        yaxis = list(title = NULL, categoryorder = "array", categoryarray = rev(df_plot$Pais)),
+        margin = list(l = 100)
+      )
+  })
+
+  # --- HHI evolucion temporal ---
+  output$plot_hhi <- renderPlotly({
+    req(data$nacionalidad, input$periodo_analitica)
+    df <- data$nacionalidad
+    paises <- paises_validos()
+    fecha_max <- max(df$Fecha, na.rm = TRUE)
+    n_meses_hhi <- as.integer(input$periodo_analitica)
+    fecha_corte_hhi <- fecha_max %m-% months(n_meses_hhi)
+    df_periodo_hhi <- df %>% dplyr::filter(Fecha > fecha_corte_hhi)
+
+    hhi_mensual <- df_periodo_hhi %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(total_mes = sum(dplyr::c_across(dplyr::all_of(paises)), na.rm = TRUE)) %>%
+      dplyr::ungroup()
+
+    hhi_vals <- sapply(seq_len(nrow(hhi_mensual)), function(i) {
+      total <- hhi_mensual$total_mes[i]
+      if (is.na(total) || total == 0) return(NA_real_)
+      vals <- as.numeric(hhi_mensual[i, paises])
+      shares <- (vals / total) * 100
+      sum(shares^2, na.rm = TRUE)
+    })
+
+    df_hhi <- data.frame(Fecha = hhi_mensual$Fecha, HHI = hhi_vals) %>% filter(!is.na(HHI))
+    
+    plot_ly() %>%
+      add_lines(data = df_hhi, x = ~Fecha, y = ~HHI, name = "HHI",
+                line = list(color = COLOR_HHI, width = 3),
+                hovertext = ~paste0("<b>", fmt_fecha_es(Fecha), "</b><br>HHI: ", fmt_num(HHI)),
+                hoverinfo = "text", showlegend = FALSE) %>%
+      layout_dashboard(
+        xaxis = list(title = NULL, tickformat = "%b\n%Y"), # Etiquetas de meses legibles
+        yaxis = list(title = "Índice HHI", range = c(0, max(df_hhi$HHI, 3000) * 1.1)),
+        shapes = list(
+          list(type = "rect", layer = "below", x0 = min(df_hhi$Fecha), x1 = max(df_hhi$Fecha),
+               y0 = 0, y1 = 1500, fillcolor = "#2A9D8F", opacity = 0.05, line = list(width = 0)),
+          list(type = "rect", layer = "below", x0 = min(df_hhi$Fecha), x1 = max(df_hhi$Fecha),
+               y0 = 1500, y1 = 2500, fillcolor = "#E07B39", opacity = 0.05, line = list(width = 0)),
+          list(type = "line", x0 = 0, x1 = 1, xref = "paper", y0 = 1500, y1 = 1500, line = list(color = "grey", dash = "dot", width = 1)),
+          list(type = "line", x0 = 0, x1 = 1, xref = "paper", y0 = 2500, y1 = 2500, line = list(color = "grey", dash = "dot", width = 1))
+        )
+      )
+  })
+
+  # --- Reactive: Load Factor promedio por pais en el periodo ---
+  lf_periodo <- reactive({
+    req(data$load_factor_pais, input$periodo_analitica)
+    lf <- data$load_factor_pais
+    n_meses <- as.integer(input$periodo_analitica)
+    fecha_max <- max(lf$Fecha, na.rm = TRUE)
+    fecha_corte <- fecha_max %m-% months(n_meses)
+    lf %>%
+      dplyr::filter(Fecha > fecha_corte, !is.na(LoadFactor)) %>%
+      dplyr::group_by(Pais) %>%
+      dplyr::summarise(LF_promedio = mean(LoadFactor, na.rm = TRUE), .groups = "drop")
+  })
+
+  # Helper: construir scatter plot con zonas de load factor
+  build_lf_scatter <- function(df_plot, x_col, x_title, hover_fn) {
+    y_max <- max(105, max(df_plot$LF_promedio, na.rm = TRUE) * 1.05)
+
+    p <- plot_ly() %>%
+      add_markers(
+        data = df_plot, x = as.formula(paste0("~", x_col)), y = ~LF_promedio,
+        marker = list(
+          size = 14,
+          color = COLORES_CONTINENTE[df_plot$Continente],
+          line = list(width = 1, color = "white")
+        ),
+        text = ~Pais, textposition = "top center",
+        hovertext = hover_fn(df_plot),
+        hoverinfo = "text", showlegend = FALSE
+      ) %>%
+      add_text(
+        data = df_plot, x = as.formula(paste0("~", x_col)), y = ~LF_promedio,
+        text = ~Pais, textposition = "top center",
+        textfont = list(size = 10, color = "#495057"),
+        hoverinfo = "none", showlegend = FALSE
+      )
+
+    x_range <- range(df_plot[[x_col]], na.rm = TRUE)
+    x_pad <- diff(x_range) * 0.15
+    x0 <- 0 # Forzar inicio en 0
+    x1 <- x_range[2] + x_pad
+
+    p %>% layout_dashboard(
+      xaxis = list(title = x_title, range = c(x0, x1)),
+      yaxis = list(title = "Load Factor (%)", ticksuffix = "%", range = c(0, y_max)),
+      hovermode = "closest",
+      shapes = list(
+        list(type = "rect", layer = "below", xref = "paper", x0 = 0, x1 = 1,
+             y0 = 0, y1 = 70, yref = "y",
+             fillcolor = "#2A9D8F", opacity = 0.07, line = list(width = 0)),
+        list(type = "rect", layer = "below", xref = "paper", x0 = 0, x1 = 1,
+             y0 = 70, y1 = 85, yref = "y",
+             fillcolor = "#D4A03C", opacity = 0.07, line = list(width = 0)),
+        list(type = "rect", layer = "below", xref = "paper", x0 = 0, x1 = 1,
+             y0 = 85, y1 = y_max, yref = "y",
+             fillcolor = "#C44E52", opacity = 0.07, line = list(width = 0)),
+        list(type = "line", xref = "paper", x0 = 0, x1 = 1,
+             y0 = 70, y1 = 70, yref = "y",
+             line = list(color = "grey50", width = 1, dash = "dash")),
+        list(type = "line", xref = "paper", x0 = 0, x1 = 1,
+             y0 = 85, y1 = 85, yref = "y",
+             line = list(color = "grey50", width = 1, dash = "dash"))
+      ),
+      annotations = list(
+        list(x = 1, xref = "paper", xanchor = "right", y = 35, yref = "y",
+             text = "Capacidad disponible", showarrow = FALSE,
+             font = list(size = 10, color = "#2A9D8F")),
+        list(x = 1, xref = "paper", xanchor = "right", y = 77.5, yref = "y",
+             text = "Equilibrio", showarrow = FALSE,
+             font = list(size = 10, color = "#D4A03C")),
+        list(x = 1, xref = "paper", xanchor = "right", y = 95, yref = "y",
+             text = "Saturación", showarrow = FALSE,
+             font = list(size = 10, color = "#C44E52"))
+      )
+    )
+  }
+
+  # --- Matriz de Capacidad Aérea Dinámica ---
+  output$plot_lf_dinamico <- renderPlotly({
+    req(input$tipo_analisis_maestro, data$nacionalidad, data$load_factor_pais)
+    df <- datos_periodo()
+    paises <- paises_validos()
+    lf_data <- lf_periodo()
+    
+    if (input$tipo_analisis_maestro == "top") {
+      totales_pais <- sort(colSums(df[, paises, drop = FALSE], na.rm = TRUE), decreasing = TRUE)
+      top_n <- head(totales_pais, 10)
+      df_base <- data.frame(Pais = names(top_n), X_Val = as.numeric(top_n), stringsAsFactors = FALSE)
+      x_title <- "Total Llegadas (Periodo)"
+    } else {
+      # Emergentes
+      n_meses <- as.integer(input$periodo_analitica)
+      df_completo <- data$nacionalidad
+      fecha_max <- max(df_completo$Fecha, na.rm = TRUE)
+      fecha_corte_actual <- fecha_max %m-% months(n_meses)
+      fecha_corte_previo <- fecha_corte_actual %m-% months(n_meses)
+      df_actual <- df_completo %>% dplyr::filter(Fecha > fecha_corte_actual)
+      df_previo <- df_completo %>% dplyr::filter(Fecha > fecha_corte_previo & Fecha <= fecha_corte_actual)
+      suma_actual <- colSums(df_actual[, paises, drop = FALSE], na.rm = TRUE)
+      suma_previo <- colSums(df_previo[, paises, drop = FALSE], na.rm = TRUE)
+      validos <- names(suma_actual)[suma_actual > 100 & suma_previo > 0]
+      variacion <- ((suma_actual[validos] - suma_previo[validos]) / suma_previo[validos]) * 100
+      # Solo crecimientos positivos
+      variacion <- variacion[variacion > 0]
+      top_n <- head(sort(variacion, decreasing = TRUE), 10)
+      df_base <- data.frame(Pais = names(top_n), X_Val = as.numeric(top_n), stringsAsFactors = FALSE)
+      x_title <- "Crecimiento (%)"
+    }
+    
+    df_plot <- merge(df_base, lf_data, by = "Pais")
+    if (nrow(df_plot) == 0) return(empty_plotly("No hay datos de ocupación para estos mercados"))
+    df_plot$Continente <- get_continente(df_plot$Pais)
+    
+    hover_fn <- function(d) {
+      paste0("<b>", d$Pais, "</b><br>",
+             x_title, ": ", fmt_num(d$X_Val), if(input$tipo_analisis_maestro=="emergentes") "%" else "",
+             "<br>Load Factor: ", round(d$LF_promedio, 1), "%")
+    }
+    
+    build_lf_scatter(df_plot, "X_Val", x_title, hover_fn)
+  })

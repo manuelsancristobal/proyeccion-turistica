@@ -1,0 +1,89 @@
+  # Helper: construir scatter plot con zonas de load factor
+  build_lf_scatter <- function(df_plot, x_col, x_title, hover_fn, log_x = FALSE) {
+    # Definir limites de Load Factor (Eje Y)
+    y_min <- 0
+    y_max <- 105
+    
+    # Definir zonas de Load Factor (Umbrales estandar JAC/IATA)
+    # Verde: < 70%, Amarillo: 70-85%, Rojo: > 85%
+    
+    p <- plot_ly() %>%
+      # 1. Zonas de fondo (Shapes) - Capas inferiores
+      layout(
+        shapes = list(
+          # Zona Verde: Capacidad disponible
+          list(type = "rect", layer = "below", xref = "paper", x0 = 0, x1 = 1,
+               y0 = 0, y1 = 70, yref = "y", fillcolor = "#2A9D8F", opacity = 0.08, line = list(width = 0)),
+          # Zona Amarilla: Equilibrio
+          list(type = "rect", layer = "below", xref = "paper", x0 = 0, x1 = 1,
+               y0 = 70, y1 = 85, yref = "y", fillcolor = "#E9C46A", opacity = 0.08, line = list(width = 0)),
+          # Zona Roja: Saturacion
+          list(type = "rect", layer = "below", xref = "paper", x0 = 0, x1 = 1,
+               y0 = 85, y1 = y_max, yref = "y", fillcolor = "#E76F51", opacity = 0.08, line = list(width = 0)),
+          # Lineas divisorias
+          list(type = "line", xref = "paper", x0 = 0, x1 = 1, y0 = 70, y1 = 70, yref = "y",
+               line = list(color = "#adb5bd", width = 1, dash = "dot")),
+          list(type = "line", xref = "paper", x0 = 0, x1 = 1, y0 = 85, y1 = 85, yref = "y",
+               line = list(color = "#adb5bd", width = 1, dash = "dot"))
+        )
+      ) %>%
+      # 2. Marcadores
+      add_markers(
+        data = df_plot, x = as.formula(paste0("~", x_col)), y = ~LF_promedio,
+        marker = list(
+          size = 14,
+          color = COLORES_CONTINENTE[df_plot$Continente],
+          line = list(width = 1.5, color = "white"),
+          opacity = 0.9
+        ),
+        text = ~Pais, textposition = "top center",
+        hovertext = hover_fn(df_plot),
+        hoverinfo = "text", showlegend = FALSE
+      ) %>%
+      # 3. Etiquetas de paises (Texto estatico pequeño)
+      add_text(
+        data = df_plot, x = as.formula(paste0("~", x_col)), y = ~LF_promedio,
+        text = ~Pais, textposition = "top center",
+        textfont = list(size = 9, color = "#495057"),
+        hoverinfo = "none", showlegend = FALSE
+      )
+
+    # Calculo de rangos del Eje X
+    x_vals <- df_plot[[x_col]]
+    if (log_x) {
+      x0 <- min(x_vals) * 0.7
+      x1 <- max(x_vals) * 1.5
+    } else {
+      x0 <- 0
+      x1 <- max(x_vals) * 1.1
+    }
+
+    p %>% layout_dashboard(
+      xaxis = list(
+        title = x_title,
+        type = if(log_x) "log" else "linear",
+        range = if(log_x) log10(c(x0, x1)) else c(x0, x1),
+        tickformat = if(log_x) ".1s" else ",.0f", # .1s reduce la longitud de los numeros (ej: 100k)
+        dtick = if(log_x) 1 else NULL, # Controla la densidad de marcas en log
+        gridcolor = "#f1f3f5"
+      ),
+      yaxis = list(
+        title = "Load Factor Promedio (%)",
+        ticksuffix = "%",
+        range = c(0, y_max),
+        gridcolor = "#f1f3f5"
+      ),
+      hovermode = "closest",
+      annotations = list(
+        list(x = 1, xref = "paper", xanchor = "right", y = 35, yref = "y",
+             text = "CAPACIDAD DISPONIBLE", showarrow = FALSE,
+             font = list(size = 8, color = "#264653", weight = "bold")),
+        list(x = 1, xref = "paper", xanchor = "right", y = 77.5, yref = "y",
+             text = "EQUILIBRIO", showarrow = FALSE,
+             font = list(size = 8, color = "#856404", weight = "bold")),
+        list(x = 1, xref = "paper", xanchor = "right", y = 95, yref = "y",
+             text = "SATURACIÓN", showarrow = FALSE,
+             font = list(size = 8, color = "#721c24", weight = "bold"))
+      )
+    )
+  }

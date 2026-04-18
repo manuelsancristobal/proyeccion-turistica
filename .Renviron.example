@@ -1,0 +1,3 @@
+SHINY_ACC_NAME='tu-cuenta-shinyapps'
+SHINY_TOKEN='tu-token'
+SHINY_SECRET='tu-secret'

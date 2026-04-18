@@ -1,0 +1,24 @@
+# Credenciales
+.Renviron
+.env
+
+# Deploy local
+rsconnect/
+
+# Configuración local de herramientas
+.claude/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Datos crudos (se descargan con el pipeline)
+data/raw/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Charts exportados (generados)
+portfolio_charts/

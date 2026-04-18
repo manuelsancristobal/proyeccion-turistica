@@ -1,0 +1,31 @@
+base_path: "."
+
+paths:
+  data_raw_salidas: "data/raw/salidas"
+  data_raw_llegadas: "data/raw/llegadas"
+  data_raw_trafico: "data/raw/trafico_aereo"
+  data_transformed: "dashboard/data"
+
+# ===================================================================
+# URLS DE DATOS — ACTUALIZAR ANTES DE CADA EJECUCION
+# Las URLs de subturismo.gob.cl cambian con cada nuevo informe.
+# El usuario debe actualizar estas URLs cuando haya datos nuevos.
+# ===================================================================
+sources:
+  # Excel de salidas de residentes chilenos (turismo emisivo)
+  salidas_url: "http://www.subturismo.gob.cl/wp-content/uploads/2026/02/202512-salidas-de-residentes-chilenos.xlsx"
+
+  # Excel de llegadas de turistas extranjeros (turismo receptivo)
+  llegadas_url: "http://www.subturismo.gob.cl/wp-content/uploads/2026/02/202512-llegadas-de-turistas-extranjeros.xlsx"
+
+  # Google Sheets de trafico aereo (se exporta como CSV automaticamente)
+  trafico_url: "https://docs.google.com/spreadsheets/d/1U3JiVuxjDcvaIoLw9XkW3JKfuh-8_3Pc/"
+
+extract:
+  timeout: 30
+
+transform:
+  forecast_horizon: 6
+  seasonal_period: 12
+  use_pandemic_dummy: true
+  parallel_workers: "auto"  # "auto" = detectCores()-1, o numero fijo
