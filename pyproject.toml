@@ -32,6 +32,9 @@ dev = [
 Homepage = "https://github.com/manuelsancristobal/proyeccion-turistica"
 Repository = "https://github.com/manuelsancristobal/proyeccion-turistica"
 
+[tool.setuptools.packages.find]
+include = ["extract*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
