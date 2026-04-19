@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PORTFOLIO_CHARTS_DIR = PROJECT_ROOT / "portfolio_charts"
 
-_default_jekyll = Path.home() / "manuelsancristobal.github.io"
+_default_jekyll = Path.home() / "OneDrive" / "Documentos" / "manuelsancristobal.github.io"
 JEKYLL_REPO = Path(os.getenv("JEKYLL_REPO", str(_default_jekyll)))
 JEKYLL_BASE = JEKYLL_REPO / "proyectos" / "proyeccion-turistica"
 JEKYLL_CHARTS_DIR = JEKYLL_BASE / "assets" / "charts"
