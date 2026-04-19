@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Scraper de salidas de residentes chilenos (turismo emisivo).
 Descarga el Excel desde la URL configurada y genera CSVs por codigo YYYYMM.
@@ -6,18 +5,21 @@ Descarga el Excel desde la URL configurada y genera CSVs por codigo YYYYMM.
 Basado en la logica de parseo de archive/Turismo Emisivo/2. Scrap.py
 """
 
+import logging
 import os
 import re
-import logging
 from pathlib import Path
-from typing import List, Optional
 
 import pandas as pd
 import requests
 
 from .utils import (
-    get_http_session, descargar_excel, strip_accents_lower, parse_mes_a_num,
-    normalize_numeric_series, match_sheet_name
+    descargar_excel,
+    get_http_session,
+    match_sheet_name,
+    normalize_numeric_series,
+    parse_mes_a_num,
+    strip_accents_lower,
 )
 
 logger = logging.getLogger(__name__)
@@ -26,6 +28,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Funciones de parseo (preservadas del codigo original)
 # ---------------------------------------------------------------------------
+
 
 def _extraer_codigo_yymm_desde_url(url: str) -> str:
     nombre = os.path.basename(url)
@@ -36,7 +39,10 @@ def _extraer_codigo_yymm_desde_url(url: str) -> str:
 _SALIDAS_SHEET_KEYWORDS = [
     "salidos por motivos turisticos",
     "salidas por motivos turisticos",
-    "series", "serie", "datos", "hoja1",
+    "series",
+    "serie",
+    "datos",
+    "hoja1",
 ]
 
 
@@ -54,8 +60,7 @@ def _clean_excel_wide_to_long(df_raw: pd.DataFrame) -> pd.DataFrame:
     # Recortar si aparece columna "Variacion"
     corte_col = None
     for _, row in df.iterrows():
-        hits = [j for j, v in enumerate(row)
-                if isinstance(v, str) and "variacion" in strip_accents_lower(v)]
+        hits = [j for j, v in enumerate(row) if isinstance(v, str) and "variacion" in strip_accents_lower(v)]
         if hits:
             corte_col = hits[0]
             break
@@ -80,7 +85,7 @@ def _clean_excel_wide_to_long(df_raw: pd.DataFrame) -> pd.DataFrame:
         header_idx = 1 if len(df) > 1 else 0
 
     df.columns = df.iloc[header_idx].astype(str).tolist()
-    df = df.iloc[header_idx + 1:].reset_index(drop=True)
+    df = df.iloc[header_idx + 1 :].reset_index(drop=True)
     df.dropna(how="all", inplace=True)
     df.dropna(axis=1, how="all", inplace=True)
     if df.empty:
@@ -97,9 +102,7 @@ def _clean_excel_wide_to_long(df_raw: pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={cand_mes: "Mes"}, inplace=True)
 
     # Eliminar totales
-    mask_total = df["Mes"].astype(str).map(strip_accents_lower).isin(
-        {"total", "totales", "subtotal", "acumulado"}
-    )
+    mask_total = df["Mes"].astype(str).map(strip_accents_lower).isin({"total", "totales", "subtotal", "acumulado"})
     df = df[~mask_total]
 
     # Columnas ano
@@ -116,14 +119,11 @@ def _clean_excel_wide_to_long(df_raw: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=["Mes", "Ano", "Cantidad", "Fecha"])
 
     # Ancho -> largo
-    df_long = df.melt(id_vars=["Mes"], value_vars=col_years,
-                      var_name="Ano", value_name="Cantidad")
+    df_long = df.melt(id_vars=["Mes"], value_vars=col_years, var_name="Ano", value_name="Cantidad")
 
     # Normalizaciones
     df_long["Ano"] = (
-        df_long["Ano"].astype(str)
-        .str.replace("Año", "", case=False, regex=False)
-        .str.replace(" ", "", regex=False)
+        df_long["Ano"].astype(str).str.replace("Año", "", case=False, regex=False).str.replace(" ", "", regex=False)
     )
     df_long["Ano"] = pd.to_numeric(df_long["Ano"], errors="coerce").astype("Int64")
 
@@ -136,9 +136,7 @@ def _clean_excel_wide_to_long(df_raw: pd.DataFrame) -> pd.DataFrame:
 
     df_long["Ano"] = df_long["Ano"].astype(int)
     df_long["Mes_num"] = df_long["Mes_num"].astype(int)
-    df_long["Fecha"] = pd.to_datetime(
-        {"year": df_long["Ano"], "month": df_long["Mes_num"], "day": 1}
-    )
+    df_long["Fecha"] = pd.to_datetime({"year": df_long["Ano"], "month": df_long["Mes_num"], "day": 1})
     df_long = df_long.drop(columns=["Mes_num"]).sort_values("Fecha").reset_index(drop=True)
     return df_long[["Mes", "Ano", "Cantidad", "Fecha"]]
 
@@ -148,9 +146,15 @@ def _normalize_fecha_inicio_de_mes(s: pd.Series) -> pd.Series:
     ss = s.astype(str).str.strip()
     parsed = pd.Series(pd.NaT, index=ss.index, dtype="datetime64[ns]")
     formatos = [
-        ("%Y-%m-%d", None), ("%d/%m/%Y", None), ("%m/%d/%Y", None),
-        ("%Y-%m", "-01"), ("%Y/%m", "/01"), ("%m-%Y", "-01"),
-        ("%m/%Y", "/01"), ("%Y%m", "01"), ("%Y%m%d", None),
+        ("%Y-%m-%d", None),
+        ("%d/%m/%Y", None),
+        ("%m/%d/%Y", None),
+        ("%Y-%m", "-01"),
+        ("%Y/%m", "/01"),
+        ("%m-%Y", "-01"),
+        ("%m/%Y", "/01"),
+        ("%Y%m", "01"),
+        ("%Y%m%d", None),
     ]
     resto = parsed.isna()
     for fmt, suf in formatos:
@@ -182,9 +186,7 @@ def clean_excel_wide_or_long(df_raw: pd.DataFrame) -> pd.DataFrame:
     """Router: detecta si es formato largo o ancho y limpia."""
     cols_norm = {strip_accents_lower(c): c for c in df_raw.columns.astype(str)}
     if "fecha" in cols_norm and "cantidad" in cols_norm:
-        tmp = df_raw.rename(columns={
-            cols_norm["fecha"]: "Fecha", cols_norm["cantidad"]: "Cantidad"
-        })
+        tmp = df_raw.rename(columns={cols_norm["fecha"]: "Fecha", cols_norm["cantidad"]: "Cantidad"})
         df = _clean_csv_like(tmp)
         if "Variable" not in df.columns:
             df["Variable"] = "Dato"
@@ -203,8 +205,8 @@ def clean_excel_wide_or_long(df_raw: pd.DataFrame) -> pd.DataFrame:
 # API publica
 # ---------------------------------------------------------------------------
 
-def extraer_salidas(url: str, out_dir: Path, timeout: int = 15,
-                    session: Optional[requests.Session] = None) -> List[Path]:
+
+def extraer_salidas(url: str, out_dir: Path, timeout: int = 15, session: requests.Session | None = None) -> list[Path]:
     """
     Descarga el Excel de salidas, parsea y exporta CSVs por codigo YYYYMM.
     Retorna lista de archivos generados.
@@ -215,8 +217,9 @@ def extraer_salidas(url: str, out_dir: Path, timeout: int = 15,
     # Descargar y leer Excel
     buf = descargar_excel(url, session=sess, timeout=timeout)
     xls = pd.ExcelFile(buf, engine="openpyxl")
-    hoja = match_sheet_name(xls.sheet_names, "Salidos por Motivos Turísticos",
-                           heuristic_keywords=_SALIDAS_SHEET_KEYWORDS)
+    hoja = match_sheet_name(
+        xls.sheet_names, "Salidos por Motivos Turísticos", heuristic_keywords=_SALIDAS_SHEET_KEYWORDS
+    )
     buf.seek(0)
     df_raw = pd.read_excel(buf, sheet_name=hoja, header=None, engine="openpyxl")
     logger.info("Excel cargado: %d filas x %d cols (hoja: %s)", df_raw.shape[0], df_raw.shape[1], hoja)
@@ -231,7 +234,7 @@ def extraer_salidas(url: str, out_dir: Path, timeout: int = 15,
     df_largo["Codigo"] = codigo
 
     # Exportar un CSV por cada codigo (en este caso sera uno solo)
-    generados: List[Path] = []
+    generados: list[Path] = []
     for cod, df_mes in df_largo.groupby("Codigo"):
         ruta = out_dir / f"real_{cod}.csv"
         df_export = df_mes[["Fecha", "Cantidad"]].copy()

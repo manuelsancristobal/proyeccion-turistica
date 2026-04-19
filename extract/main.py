@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Punto de entrada de la capa Extract.
 Lee URLs desde config.yml, descarga y parsea los Excel/Sheets, genera CSVs limpios.
@@ -7,8 +6,8 @@ Uso: python -m extract.main  (desde la raiz del proyecto)
   o: python extract/main.py
 """
 
-import sys
 import logging
+import sys
 from pathlib import Path
 
 # Asegurar que el directorio raiz este en el path
@@ -17,10 +16,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from extract.config import load_config
-from extract.utils import get_http_session
-from extract.scraper_salidas import extraer_salidas
 from extract.scraper_llegadas import extraer_llegadas
+from extract.scraper_salidas import extraer_salidas
 from extract.scraper_trafico import extraer_trafico
+from extract.utils import get_http_session
 
 logging.basicConfig(
     level=logging.INFO,

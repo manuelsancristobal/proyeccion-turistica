@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """Utilidades compartidas para la capa Extract."""
 
 import io
-import re
 import logging
+import re
 import unicodedata
-from typing import Optional
 
 import pandas as pd
 import requests
@@ -14,9 +12,7 @@ from urllib3.util.retry import Retry
 
 logger = logging.getLogger(__name__)
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; TurismoPipeline/2.0)"
-}
+HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; TurismoPipeline/2.0)"}
 
 
 def get_http_session(timeout: int = 15) -> requests.Session:
@@ -38,8 +34,7 @@ def get_http_session(timeout: int = 15) -> requests.Session:
     return sess
 
 
-def descargar_excel(url: str, session: Optional[requests.Session] = None,
-                    timeout: int = 15) -> io.BytesIO:
+def descargar_excel(url: str, session: requests.Session | None = None, timeout: int = 15) -> io.BytesIO:
     """Descarga un Excel desde URL y retorna BytesIO."""
     sess = session or get_http_session(timeout)
     logger.info("Descargando: %s", url)
@@ -60,16 +55,49 @@ def strip_accents_lower(s: str) -> str:
 
 MESES_MAP = {
     # Español
-    "enero": 1, "ene": 1, "febrero": 2, "feb": 2, "marzo": 3, "mar": 3,
-    "abril": 4, "abr": 4, "mayo": 5, "may": 5, "junio": 6, "jun": 6,
-    "julio": 7, "jul": 7, "agosto": 8, "ago": 8, "septiembre": 9,
-    "setiembre": 9, "sep": 9, "set": 9, "octubre": 10, "oct": 10,
-    "noviembre": 11, "nov": 11, "diciembre": 12, "dic": 12,
+    "enero": 1,
+    "ene": 1,
+    "febrero": 2,
+    "feb": 2,
+    "marzo": 3,
+    "mar": 3,
+    "abril": 4,
+    "abr": 4,
+    "mayo": 5,
+    "may": 5,
+    "junio": 6,
+    "jun": 6,
+    "julio": 7,
+    "jul": 7,
+    "agosto": 8,
+    "ago": 8,
+    "septiembre": 9,
+    "setiembre": 9,
+    "sep": 9,
+    "set": 9,
+    "octubre": 10,
+    "oct": 10,
+    "noviembre": 11,
+    "nov": 11,
+    "diciembre": 12,
+    "dic": 12,
     # Inglés
-    "january": 1, "jan": 1, "february": 2, "march": 3,
-    "april": 4, "apr": 4, "june": 6, "july": 7,
-    "august": 8, "aug": 8, "sept": 9, "september": 9,
-    "october": 10, "november": 11, "december": 12, "dec": 12,
+    "january": 1,
+    "jan": 1,
+    "february": 2,
+    "march": 3,
+    "april": 4,
+    "apr": 4,
+    "june": 6,
+    "july": 7,
+    "august": 8,
+    "aug": 8,
+    "sept": 9,
+    "september": 9,
+    "october": 10,
+    "november": 11,
+    "december": 12,
+    "dec": 12,
 }
 
 
@@ -131,7 +159,7 @@ def match_sheet_name(available: list, target=None, heuristic_keywords=None):
     return available[0]
 
 
-def parse_mes_a_num(x) -> Optional[int]:
+def parse_mes_a_num(x) -> int | None:
     """Convierte nombre o numero de mes a int (1-12)."""
     if pd.isna(x):
         return None

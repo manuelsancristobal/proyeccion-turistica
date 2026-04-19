@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Carga configuracion desde config.yml."""
 
 from pathlib import Path
@@ -12,7 +11,7 @@ def load_config() -> dict:
     cfg_path = root / "config.yml"
     if not cfg_path.exists():
         raise FileNotFoundError(f"No se encontro config.yml en {root}")
-    with open(cfg_path, "r", encoding="utf-8") as f:
+    with open(cfg_path, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
 
     base = Path(cfg.get("base_path", str(root)))

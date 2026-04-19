@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Descarga datos de trafico aereo desde Google Sheets.
 """
 
-import re
 import logging
+import re
 import unicodedata
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 import requests
@@ -54,7 +52,7 @@ _COL_ALIASES = {
 }
 
 
-def _detect_col(norm_names: list, alias_key: str) -> Optional[str]:
+def _detect_col(norm_names: list, alias_key: str) -> str | None:
     """Detecta una columna por sus alias conocidos."""
     aliases = _COL_ALIASES.get(alias_key, [])
     for a in aliases:
@@ -92,9 +90,7 @@ def _normalize_trafico_csv(ruta: Path) -> pd.DataFrame:
 
     # Construir Fecha
     df["Fecha"] = pd.to_datetime(
-        df[ano_col].astype("Int64").astype(str) + "-" +
-        df[mes_col].astype("Int64").astype(str) + "-01",
-        errors="coerce"
+        df[ano_col].astype("Int64").astype(str) + "-" + df[mes_col].astype("Int64").astype(str) + "-01", errors="coerce"
     )
     df["Mes"] = df[mes_col]
 
@@ -147,8 +143,7 @@ def _normalize_trafico_csv(ruta: Path) -> pd.DataFrame:
     return df[std_cols].reset_index(drop=True)
 
 
-def extraer_trafico(url: str, out_dir: Path, timeout: int = 30,
-                    session: Optional[requests.Session] = None) -> Path:
+def extraer_trafico(url: str, out_dir: Path, timeout: int = 30, session: requests.Session | None = None) -> Path:
     """
     Descarga el Google Sheet como CSV, normaliza su estructura y lo guarda en out_dir.
     Retorna la ruta del archivo generado.
@@ -182,7 +177,6 @@ def extraer_trafico(url: str, out_dir: Path, timeout: int = 30,
 
     ruta = out_dir / "trafico_aereo.csv"
     df.to_csv(ruta, index=False, encoding="utf-8")
-    logger.info("Trafico aereo normalizado: %s (%d filas, %d columnas)",
-                ruta, len(df), len(df.columns))
+    logger.info("Trafico aereo normalizado: %s (%d filas, %d columnas)", ruta, len(df), len(df.columns))
 
     return ruta

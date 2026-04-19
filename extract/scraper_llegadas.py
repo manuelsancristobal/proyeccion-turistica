@@ -1,20 +1,22 @@
-# -*- coding: utf-8 -*-
 """
 Scraper de llegadas de turistas extranjeros (turismo receptivo).
 Descarga el Excel desde la URL configurada y genera CSVs en formato wide.
 """
 
-import re
 import logging
+import re
 from pathlib import Path
-from typing import List, Optional
 
 import pandas as pd
 import requests
 
 from .utils import (
-    get_http_session, descargar_excel, strip_accents_lower,
-    normalize_numeric, match_sheet_name, MESES_MAP
+    MESES_MAP,
+    descargar_excel,
+    get_http_session,
+    match_sheet_name,
+    normalize_numeric,
+    strip_accents_lower,
 )
 
 logger = logging.getLogger(__name__)
@@ -22,21 +24,17 @@ logger = logging.getLogger(__name__)
 
 def _match_sheet_llegadas(available: list, keyword: str = "llegadas"):
     """Busca la hoja que contenga el keyword (sin tildes)."""
-    return match_sheet_name(available, keyword,
-                            heuristic_keywords=["datos", "serie", "hoja1"])
+    return match_sheet_name(available, keyword, heuristic_keywords=["datos", "serie", "hoja1"])
 
 
 _SKIP_KEYWORDS = {"total", "variaci", "acumul", "promedio", "nan", "none"}
 
 
-def _find_year_row(df: pd.DataFrame, max_rows: int = 10) -> Optional[int]:
+def _find_year_row(df: pd.DataFrame, max_rows: int = 10) -> int | None:
     """Devuelve el indice de la primera fila que contiene >= 2 años (2000-2030)."""
     for i in range(min(max_rows, len(df))):
         row = df.iloc[i]
-        year_count = sum(
-            1 for v in row
-            if str(v).strip().isdigit() and 2000 <= int(str(v).strip()) <= 2030
-        )
+        year_count = sum(1 for v in row if str(v).strip().isdigit() and 2000 <= int(str(v).strip()) <= 2030)
         if year_count >= 2:
             return i
     return None
@@ -81,8 +79,7 @@ def _parse_llegadas_excel(buf, sheet_name) -> pd.DataFrame:
     """
     buf.seek(0)
     df_raw = pd.read_excel(buf, sheet_name=sheet_name, header=None, engine="openpyxl")
-    logger.info("Excel cargado: %d filas x %d cols (hoja: %s)",
-                df_raw.shape[0], df_raw.shape[1], sheet_name)
+    logger.info("Excel cargado: %d filas x %d cols (hoja: %s)", df_raw.shape[0], df_raw.shape[1], sheet_name)
 
     df_raw.dropna(how="all", inplace=True)
     df_raw.dropna(axis=1, how="all", inplace=True)
@@ -123,9 +120,7 @@ def _parse_llegadas_excel(buf, sheet_name) -> pd.DataFrame:
             break
     # Fallback: primera columna que no sea de fechas
     if entity_col_idx is None:
-        entity_col_idx = next(
-            (j for j in range(df_raw.shape[1]) if j not in col_date_map), None
-        )
+        entity_col_idx = next((j for j in range(df_raw.shape[1]) if j not in col_date_map), None)
     if entity_col_idx is None:
         return pd.DataFrame()
 
@@ -141,9 +136,7 @@ def _parse_llegadas_excel(buf, sheet_name) -> pd.DataFrame:
     entity_col = df_data.columns[entity_col_idx]
     entity_names = df_data[entity_col].astype(str).str.strip()
 
-    valid_mask = ~entity_names.map(
-        lambda x: any(kw in strip_accents_lower(x) for kw in _SKIP_KEYWORDS)
-    )
+    valid_mask = ~entity_names.map(lambda x: any(kw in strip_accents_lower(x) for kw in _SKIP_KEYWORDS))
     df_data = df_data[valid_mask]
     entity_names = entity_names[valid_mask]
 
@@ -178,13 +171,11 @@ def _parse_llegadas_excel(buf, sheet_name) -> pd.DataFrame:
     result = result.reset_index()
     result = result.sort_values("Fecha").reset_index(drop=True)
 
-    logger.info("Hoja '%s': %d fechas x %d entidades", sheet_name,
-                len(result), len(result.columns) - 1)
+    logger.info("Hoja '%s': %d fechas x %d entidades", sheet_name, len(result), len(result.columns) - 1)
     return result
 
 
-def extraer_llegadas(url: str, out_dir: Path, timeout: int = 15,
-                     session: Optional[requests.Session] = None) -> List[Path]:
+def extraer_llegadas(url: str, out_dir: Path, timeout: int = 15, session: requests.Session | None = None) -> list[Path]:
     """
     Descarga el Excel de llegadas y genera CSVs en formato wide.
     El Excel puede tener multiples hojas (por nacionalidad, por paso, etc).
@@ -196,7 +187,7 @@ def extraer_llegadas(url: str, out_dir: Path, timeout: int = 15,
     xls = pd.ExcelFile(buf, engine="openpyxl")
     logger.info("Hojas disponibles: %s", xls.sheet_names)
 
-    generados: List[Path] = []
+    generados: list[Path] = []
 
     # Intentar encontrar hojas por tipo
     hojas_config = [
