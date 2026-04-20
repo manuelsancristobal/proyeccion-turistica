@@ -16,19 +16,19 @@ tech_stack:
 
 Explora las proyecciones de turismo emisivo y receptivo de Chile con filtros dinámicos, descomposición de series temporales y modelos de pronóstico.
 
-{::nomarkdown}
-<div style="position: relative; width: 100%; padding-bottom: 75%; overflow: hidden;">
+<div style="position: relative; width: 100%; padding-bottom: 75%; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
   <iframe
     src="https://manuel-san-cristobal-opazo.shinyapps.io/dashboard/"
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
     loading="lazy"
-    title="Dashboard de Proyección Turística Chile">
+    title="Dashboard de Proyección Turística Chile"
+    allowfullscreen>
   </iframe>
 </div>
+
 <p style="font-size: 12px; color: #999; margin-top: 8px; text-align: center;">
   Si el dashboard no carga, puede que las horas gratuitas del mes se hayan agotado. Los gráficos estáticos a continuación resumen los hallazgos principales.
 </p>
-{:/nomarkdown}
 
 ## Análisis Complementario
 

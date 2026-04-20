@@ -17,8 +17,13 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PORTFOLIO_CHARTS_DIR = PROJECT_ROOT / "portfolio_charts"
 
-_default_jekyll = Path.home() / "OneDrive" / "Documentos" / "manuelsancristobal.github.io"
-JEKYLL_REPO = Path(os.getenv("JEKYLL_REPO", str(_default_jekyll)))
+_jekyll_env = os.getenv("JEKYLL_REPO")
+if not _jekyll_env:
+    raise EnvironmentError(
+        "Variable JEKYLL_REPO no definida. "
+        "Exporta la ruta al repo Jekyll: export JEKYLL_REPO=/path/to/repo"
+    )
+JEKYLL_REPO = Path(_jekyll_env)
 JEKYLL_BASE = JEKYLL_REPO / "proyectos" / "proyeccion-turistica"
 JEKYLL_CHARTS_DIR = JEKYLL_BASE / "assets" / "charts"
 JEKYLL_PROJECTS_DIR = JEKYLL_REPO / "_projects"
