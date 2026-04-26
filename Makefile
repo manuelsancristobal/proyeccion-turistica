@@ -1,4 +1,4 @@
-.PHONY: help install install-dev lint test coverage extract transform assets deploy-shiny deploy-jekyll deploy launch clean
+.PHONY: help install install-dev lint test coverage extract transform assets deploy-shiny deploy-jekyll deploy ver clean
 
 help:
 	@echo "Comandos disponibles:"
@@ -13,7 +13,7 @@ help:
 	@echo "  make deploy-shiny  Deploy dashboard a shinyapps.io"
 	@echo "  make deploy-jekyll Deploy página al portafolio Jekyll"
 	@echo "  make deploy        Ejecutar ambos deploys"
-	@echo "  make launch        Lanzar dashboard localmente"
+	@echo "  make ver           Lanzar dashboard Shiny localmente"
 	@echo "  make clean         Eliminar archivos generados y caché"
 
 install:
@@ -51,8 +51,8 @@ deploy-jekyll:
 
 deploy: deploy-shiny deploy-jekyll
 
-launch:
-	Rscript -e "shiny::runApp('dashboard')"
+ver:
+	python run.py ver
 
 clean:
 	rm -rf build/ dist/ *.egg-info

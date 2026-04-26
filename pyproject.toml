@@ -48,4 +48,18 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 ignore = ["E501", "B905"]
 
 [tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
 "extract/main.py" = ["E402"]
+
+[tool.coverage.run]
+source = ["extract"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
