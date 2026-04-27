@@ -23,9 +23,7 @@ _PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # --- Colores ANSI (se desactivan si la terminal no soporta) -----------
 
 def _supports_color() -> bool:
-    if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty():
-        return False
-    return True
+    return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
 
 _COLOR = _supports_color()
 
