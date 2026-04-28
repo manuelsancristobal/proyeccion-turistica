@@ -11,6 +11,7 @@ Uso:
     python run.py test     # Ejecuta tests + linting
     python run.py all      # Pipeline completo: extract -> transform -> assets -> deploy
 """
+
 from __future__ import annotations
 
 import os
@@ -22,28 +23,36 @@ _PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # --- Colores ANSI (se desactivan si la terminal no soporta) -----------
 
+
 def _supports_color() -> bool:
     return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
 
+
 _COLOR = _supports_color()
+
 
 def _green(text: str) -> str:
     return f"\033[92m{text}\033[0m" if _COLOR else text
 
+
 def _cyan(text: str) -> str:
     return f"\033[96m{text}\033[0m" if _COLOR else text
+
 
 def _red(text: str) -> str:
     return f"\033[91m{text}\033[0m" if _COLOR else text
 
+
 def _bold(text: str) -> str:
     return f"\033[1m{text}\033[0m" if _COLOR else text
+
 
 def _yellow(text: str) -> str:
     return f"\033[93m{text}\033[0m" if _COLOR else text
 
 
 # --- Helpers ----------------------------------------------------------
+
 
 def _run(cmd: list[str], label: str) -> bool:
     """Ejecuta un comando y retorna True si fue exitoso."""
@@ -60,6 +69,7 @@ def _run(cmd: list[str], label: str) -> bool:
 
 
 # --- Comandos ---------------------------------------------------------
+
 
 def cmd_extract() -> bool:
     return _run(
@@ -130,17 +140,17 @@ def cmd_all(args: list[str]) -> bool:
 
 def cmd_help() -> None:
     print(f"""
-{_bold('Proyección Turística - Comandos disponibles')}
+{_bold("Proyección Turística - Comandos disponibles")}
 
-  python run.py {_green('extract')}      Extrae datos (Python)
-  python run.py {_green('transform')}    Transforma datos (R)
-  python run.py {_green('assets')}       Genera gráficos estáticos
-  python run.py {_green('deploy')}       Copia al Jekyll + publica a Shiny
-  python run.py {_green('ver')}          Lanza dashboard Shiny local
-  python run.py {_green('test')}         Ejecuta tests (pytest) + linting (ruff)
-  python run.py {_green('all')}          Pipeline completo: extract -> transform -> assets -> deploy
+  python run.py {_green("extract")}      Extrae datos (Python)
+  python run.py {_green("transform")}    Transforma datos (R)
+  python run.py {_green("assets")}       Genera gráficos estáticos
+  python run.py {_green("deploy")}       Copia al Jekyll + publica a Shiny
+  python run.py {_green("ver")}          Lanza dashboard Shiny local
+  python run.py {_green("test")}         Ejecuta tests (pytest) + linting (ruff)
+  python run.py {_green("all")}          Pipeline completo: extract -> transform -> assets -> deploy
 
-{_yellow('Ejemplo:')} python run.py all
+{_yellow("Ejemplo:")} python run.py all
 """)
 
 

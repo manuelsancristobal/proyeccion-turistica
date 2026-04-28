@@ -1,7 +1,10 @@
 # Proyección Turística - Pipeline Predictivo de Demanda
 
+## Contexto
+Este fue el primer proyecto que alguna vez desarrollé, empecé en 2022 jugando con Google Colab y con datos de la publicación de llegadas de turistas de Sernatur, haciendo *hard coding*, intentando buscar algún quiebre y así confirmar que los programas de promoción internacional tenían un efecto. Sin embargo, no alcancé a terminarlo para mi tesis de posgrado y tuve que conformarme con una revisión de la literatura. Con el tiempo, aprendí de métodos de descomposición como el STL, y métodos de pronóstico como ARIMA y SARIMAX.
+
 ## Impacto y Valor del Proyecto
-Este proyecto implementa un pipeline de datos robusto para proyectar la demanda turística de Chile, integrando datos de tráfico aéreo, flujos fronterizos terrestres y microdatos de nacionalidad. La solución permite anticipar cuellos de botella en pasos fronterizos y aeropuertos regionales con un horizonte de 12-24 meses. Es una herramienta crítica para la Subsecretaría de Turismo y el MOP en la priorización de obras públicas y la asignación de recursos consulares y de seguridad.
+Este proyecto implementa, a través de un pipeline de datos, un modelo de pronóstico para proyectar la demanda turística de Chile, integrando datos de tráfico aéreo, flujos fronterizos terrestres y microdatos de nacionalidad. Esto te permite anticipar cuellos de botella en pasos fronterizos y aeropuertos regionales con un horizonte de 12-24 meses. Es una herramienta para la priorización de obras públicas y la asignación de recursos en pasos fronterizos.
 
 ## Stack Tecnológico
 - **Lenguajes**: Python 3.10+ (ETL/Orquestación), R 4.3+ (Modelamiento estadístico).

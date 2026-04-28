@@ -1,6 +1,6 @@
 # Changelog
 
-Todos los cambios notables de este proyecto se documentan en este archivo.
+En este archivo puedes encontrar todos los cambios notables de este proyecto.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 
 ## [1.0.0] - 2025
