@@ -1,5 +1,7 @@
 # Proyección Turística - Pipeline Predictivo de Demanda
 
+[![CI](https://github.com/manuelsancristobal/proyeccion-turistica/actions/workflows/ci.yml/badge.svg)](https://github.com/manuelsancristobal/proyeccion-turistica/actions/workflows/ci.yml)
+
 ## Contexto
 Este fue el primer proyecto que alguna vez desarrollé, empecé en 2022 jugando con Google Colab y con datos de la publicación de llegadas de turistas de Sernatur, haciendo *hard coding*, intentando buscar algún quiebre y así confirmar que los programas de promoción internacional tenían un efecto. Sin embargo, no alcancé a terminarlo para mi tesis de posgrado y tuve que conformarme con una revisión de la literatura. Con el tiempo, aprendí de métodos de descomposición como el STL, y métodos de pronóstico como ARIMA y SARIMAX.
 
