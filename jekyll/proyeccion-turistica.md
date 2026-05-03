@@ -12,9 +12,13 @@ tech_stack:
   - SARIMAX
 ---
 
-## Dashboard Interactivo
+## Dinámicas de Recuperación y Crecimiento
 
-Explora las proyecciones de turismo emisivo y receptivo de Chile con filtros dinámicos, descomposición de series temporales y modelos de pronóstico.
+**La recuperación del flujo turístico en Chile ha superado los niveles previos a la pandemia, manteniendo una tendencia de crecimiento constante.** Como se aprecia en la visualización de proyecciones, tanto el flujo de residentes al extranjero como la llegada de turistas internacionales muestran una trayectoria alcista sólida para los próximos meses.
+
+## Dashboard Interactivo de Pronósticos
+
+Explora las proyecciones de turismo emisivo y receptivo con filtros dinámicos y modelos estadísticos avanzados.
 
 <div style="position: relative; width: 100%; padding-bottom: 75%; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
   <iframe
@@ -27,65 +31,50 @@ Explora las proyecciones de turismo emisivo y receptivo de Chile con filtros din
 </div>
 
 <p style="font-size: 12px; color: #999; margin-top: 8px; text-align: center;">
-  Si el dashboard no carga, puede que las horas gratuitas del mes se hayan agotado. Los gráficos estáticos a continuación resumen los hallazgos principales.
+  Si la aplicación interactiva no carga por límite de cuota, los gráficos estáticos de análisis resumen los hallazgos de modo directo.
 </p>
 
-## Análisis Complementario
+## Análisis de Series Temporales
 
-### Salidas de residentes chilenos al extranjero
-
-El gráfico muestra la serie histórica mensual de salidas de residentes, la tendencia extraída mediante descomposición STL y las proyecciones generadas por modelos ARIMA y SARIMAX. El modelo SARIMAX incorpora una variable dummy para el periodo pandémico, mejorando la estimación post-COVID.
+### Proyección de Salidas de Residentes
+**Los modelos ARIMA y SARIMAX confirman la consolidación de la tendencia alcista tras el impacto sanitario.** Como se aprecia en el gráfico de proyecciones, el modelo SARIMAX mejora la precisión al integrar el periodo pandémico de forma específica. La recuperación no solo es total, sino que marca nuevos récords de flujo mes a mes.
 
 ![Salidas de residentes con tendencia y proyecciones ARIMA/SARIMAX](./assets/charts/01_salidas_proyeccion.png)
 
-Se observa un crecimiento sostenido en las salidas de residentes previo a 2020, seguido de una caída abrupta por la pandemia y una recuperación que ha superado los niveles pre-pandémicos. Las proyecciones de ambos modelos convergen, sugiriendo que la tendencia alcista se mantendrá en el horizonte de pronóstico.
-
 ---
 
-### Llegadas de turistas extranjeros
-
-El flujo de turistas internacionales hacia Chile se concentra en pocos mercados emisores. El gráfico muestra la evolución mensual de los 5 principales mercados por volumen de llegadas.
+### Concentración de Mercados Emisores
+**Argentina lidera con fuerza el volumen de llegadas, mientras otros mercados regionales muestran ritmos de recuperación dispares.** Como se observa en la comparativa de nacionalidades, la base de visitantes hacia Chile posee una dependencia elevada del mercado regional, lo que plantea desafíos y oportunidades de diversificación.
 
 ![Top 5 mercados emisores de turistas hacia Chile](./assets/charts/02_llegadas_nacionalidad.png)
 
-Argentina domina ampliamente como mercado emisor, seguido a distancia por Brasil y otros países de la región. La recuperación post-pandémica muestra velocidades dispares entre mercados, revelando oportunidades para diversificar la base de visitantes.
-
 ---
 
-### Frecuencia de vuelos internacionales
-
-La oferta de conectividad aérea es un indicador adelantado de la demanda turística. El gráfico muestra el total de operaciones aéreas internacionales salientes por mes, con suavizado LOESS para visualizar la tendencia subyacente.
+### Capacidad y Oferta Aérea
+El incremento en la frecuencia de vuelos, impulsado por operadores de bajo costo, actúa como motor de la demanda turística. Como se aprecia en la visualización con suavizado LOESS, el número de operaciones internacionales refleja un cambio de estructura en la industria. Este fenómeno de apertura competitiva, detallado en el análisis de concentración del [**Bar Chart Race: Movimiento Aéreo**](/proyectos/barchart-race/), facilita la estabilidad de los flujos y mejora la precisión de los pronósticos de largo plazo.
 
 ![Frecuencia de vuelos internacionales salientes con suavizado LOESS](./assets/charts/03_frecuencia_vuelos.png)
 
-El número de operaciones refleja tanto la estacionalidad turística como cambios estructurales en la industria aérea. La entrada de operadores low-cost ha contribuido al aumento de frecuencias en años recientes.
-
 ---
 
-### Factor de ocupación por aeropuerto
-
-El load factor mide la relación entre pasajeros transportados y capacidad estimada. Valores superiores al 85% indican saturación operativa y potencial necesidad de ampliación de rutas o frecuencias.
+### Saturación y Ocupación Aeroportuaria
+**Los aeropuertos operan de forma constante con factores de ocupación superiores al 85%, indicando una presión sobre la capacidad actual.** Como se vio en el gráfico de load factor, estos niveles críticos señalan ventanas de oportunidad para la apertura de nuevas rutas o el aumento de frecuencias en nodos estratégicos.
 
 ![Factor de ocupación de los principales aeropuertos](./assets/charts/04_load_factor.png)
 
-Los aeropuertos principales operan consistentemente con altos factores de ocupación, lo que sugiere una demanda robusta que presiona la capacidad disponible. Periodos con load factor cercano o superior al umbral del 85% señalan ventanas de oportunidad para nuevas rutas.
-
 ---
 
-### Estacionalidad de salidas
-
-El heatmap revela el patrón estacional de las salidas de residentes. Colores más intensos indican mayor flujo de viajeros.
+### Patrones de Estacionalidad
+**Enero, febrero y julio se consolidan como los periodos de mayor flujo, con una amplitud estacional que crece año tras año.** Como se aprecia en el mapa de calor (heatmap), existe un patrón recurrente de peaks en el verano austral y las vacaciones de invierno. Los años de restricciones sanitarias destacan de forma visual como franjas de baja intensidad.
 
 ![Heatmap de estacionalidad de salidas de residentes](./assets/charts/05_estacionalidad.png)
 
-Se identifica un patrón recurrente con peaks en enero-febrero (verano austral) y julio (vacaciones de invierno). La amplitud estacional crece con el tiempo, reflejando un mercado en expansión. Los años 2020-2021 aparecen como franjas claras, evidenciando el impacto de las restricciones sanitarias.
-
 ---
 
-## Metodología
+## Metodología del Pipeline ETL
 
-Este proyecto implementa un pipeline ETL completo:
+Este proyecto implementa un ciclo de datos completo:
 
-- **Extracción** (Python): Descarga automatizada de datos desde el portal de SERNATUR y la Junta Aeronáutica Civil.
-- **Transformación** (R): Descomposición STL de series temporales, cálculo de tendencias, modelos de pronóstico ARIMA y SARIMAX con horizonte de 6 meses, cálculo de load factors y métricas de concentración de mercado (HHI).
-- **Visualización** (R Shiny): Dashboard interactivo con tres módulos: Analítica de mercados, Llegadas de turistas y Salidas de residentes.
+- **Extracción** (Python): Descarga de forma automática desde SERNATUR y la Junta Aeronáutica Civil.
+- **Transformación** (R): Descomposición STL, modelos de pronóstico a 6 meses y cálculo de métricas de concentración de mercado.
+- **Visualización** (R Shiny): Interfaz con módulos para la analítica de mercados y flujos.
