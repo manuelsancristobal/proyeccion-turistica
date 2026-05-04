@@ -233,6 +233,13 @@ def extraer_salidas(url: str, out_dir: Path, timeout: int = 15, session: request
     codigo = _extraer_codigo_yymm_desde_url(url)
     df_largo["Codigo"] = codigo
 
+    # Limpiar CSVs anteriores
+    old_files = list(out_dir.glob("real_*.csv"))
+    for f in old_files:
+        f.unlink()
+    if old_files:
+        logger.info("Limpiados %d archivos anteriores en %s", len(old_files), out_dir)
+
     # Exportar un CSV por cada codigo (en este caso sera uno solo)
     generados: list[Path] = []
     for cod, df_mes in df_largo.groupby("Codigo"):

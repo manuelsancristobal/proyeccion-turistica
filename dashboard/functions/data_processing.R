@@ -18,20 +18,16 @@ read_and_process_data <- function() {
   
   cfg <- yaml::read_yaml(cfg_path)
   
-  # Si estamos en produccion (ej. shinyapps.io), base_path debe ser relativo
-  # Detectamos esto si base_path no existe en el sistema actual o esta vacio
   base_root <- cfg$base_path
-  is_local <- base_root != "" && dir.exists(base_root)
-  
-  if (!is_local) {
-    base_root <- "." # En la nube, todo es relativo a la app
-  }
+  if (base_root == "") base_root <- "."
 
   # Determinar la carpeta de datos transformados
-  # Si es local, usamos la ruta completa desde la raiz
-  # Si es despliegue, usamos la ruta relativa interna "data"
   transformed_path <- cfg$paths$data_transformed
-  if (!is_local && grepl("^dashboard/", transformed_path)) {
+
+  # Detectar si estamos dentro de dashboard/ (despliegue en la nube)
+  # Si la ruta con prefijo "dashboard/" no existe pero sin el si, estamos desplegados
+  actual_transformed <- file.path(base_root, transformed_path)
+  if (!dir.exists(actual_transformed) && grepl("^dashboard/", transformed_path)) {
     transformed_path <- gsub("^dashboard/", "", transformed_path)
   }
   

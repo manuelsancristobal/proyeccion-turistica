@@ -13,10 +13,10 @@ paths:
 # ===================================================================
 sources:
   # Excel de salidas de residentes chilenos (turismo emisivo)
-  salidas_url: "http://www.subturismo.gob.cl/wp-content/uploads/2026/02/202512-salidas-de-residentes-chilenos.xlsx"
+  salidas_url: "http://www.subturismo.gob.cl/wp-content/uploads/2026/04/202603-salidas-de-residentes-chilenos.xlsx"
 
   # Excel de llegadas de turistas extranjeros (turismo receptivo)
-  llegadas_url: "http://www.subturismo.gob.cl/wp-content/uploads/2026/02/202512-llegadas-de-turistas-extranjeros.xlsx"
+  llegadas_url: "http://www.subturismo.gob.cl/wp-content/uploads/2026/04/202603-llegadas-de-turistas-extranjeros.xlsx"
 
   # Google Sheets de trafico aereo (se exporta como CSV automaticamente)
   trafico_url: "https://docs.google.com/spreadsheets/d/1U3JiVuxjDcvaIoLw9XkW3JKfuh-8_3Pc/"

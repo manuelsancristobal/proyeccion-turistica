@@ -1,7 +1,7 @@
 Aeropuerto,NPaisesOrigen,Top3Paises,ConcentracionTop3Pct,NOperadores,MesesActivos,PatronEstacional
-Aeropuerto C. Arturo Merino Benítez,27,"BRASIL (27.2%), ARGENTINA (17.4%), PERU (14.6%)",59.2,41,12,Todo el ano
-Aeropuerto Carriel Sur,2,"BRASIL (58.5%), ARGENTINA (41.5%)",100,1,5,Estacional
+Aeropuerto C. Arturo Merino Benítez,26,"BRASIL (27.2%), ARGENTINA (17.2%), PERU (14.5%)",58.9,41,12,Todo el ano
+Aeropuerto Carriel Sur,3,"BRASIL (39.5%), PERU (32.5%), ARGENTINA (28%)",100,2,5,Estacional
 Aeropuerto Cerro Moreno,6,"COLOMBIA (63.6%), PERU (34.3%), BRASIL (1.4%)",99.3,5,12,Todo el ano
-Aeropuerto Diego Aracena,7,"BOLIVIA (49.8%), ARGENTINA (37.2%), BRASIL (6.9%)",93.9,7,12,Todo el ano
+Aeropuerto Diego Aracena,6,"BOLIVIA (55.9%), ARGENTINA (35.5%), BRASIL (6.6%)",98,5,12,Todo el ano
 Aeropuerto La Florida,3,"BRASIL (65.1%), ARGENTINA (23.2%), PERU (11.7%)",100,2,2,Limitado
-Aeropuerto Punta Arenas,2,"INGLATERRA (93.6%), ARGENTINA (6.4%)",100,2,12,Todo el ano
+Aeropuerto Punta Arenas,2,"INGLATERRA (93.7%), ARGENTINA (6.3%)",100,2,12,Todo el ano

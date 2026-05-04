@@ -6,7 +6,9 @@ Uso:
     python run.py extract  # Extrae datos (Python)
     python run.py transform # Transforma datos (R)
     python run.py assets   # Genera gráficos estáticos
-    python run.py deploy   # Copia archivos al repo Jekyll + Shiny
+    python run.py deploy        # Ambos deploys (Jekyll + Shiny)
+    python run.py deploy-shiny  # Deploy dashboard a shinyapps.io
+    python run.py deploy-jekyll # Copia archivos al repo Jekyll
     python run.py ver      # Lanza el dashboard Shiny local
     python run.py test     # Ejecuta tests + linting
     python run.py all      # Pipeline completo: extract -> transform -> assets -> deploy
@@ -14,12 +16,35 @@ Uso:
 
 from __future__ import annotations
 
+import glob
 import os
+import shutil
 import subprocess
 import sys
 
 # Directorio raiz del proyecto (donde vive run.py)
 _PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+
+def _find_rscript() -> str:
+    """Devuelve la ruta a Rscript, buscando en el PATH y ubicaciones comunes de Windows."""
+    found = shutil.which("Rscript")
+    if found:
+        return found
+    if sys.platform == "win32":
+        for pattern in [
+            os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "R", "R-*", "bin", "Rscript.exe"),
+            os.path.join(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"), "R", "R-*", "bin", "Rscript.exe"),
+        ]:
+            matches = sorted(glob.glob(pattern), reverse=True)
+            if matches:
+                return matches[0]
+    raise FileNotFoundError(
+        "No se encontro Rscript. Instala R o agrega su directorio bin al PATH."
+    )
+
+
+_RSCRIPT = _find_rscript()
 
 # --- Colores ANSI (se desactivan si la terminal no soporta) -----------
 
@@ -80,33 +105,41 @@ def cmd_extract() -> bool:
 
 def cmd_transform() -> bool:
     return _run(
-        ["Rscript", "transform/main.R"],
+        [_RSCRIPT, "transform/main.R"],
         "Transform - Transformando datos con R",
     )
 
 
 def cmd_assets() -> bool:
     return _run(
-        ["Rscript", "export_charts.R"],
+        [_RSCRIPT, "export_charts.R"],
         "Assets - Generando gráficos estáticos",
     )
 
 
-def cmd_deploy() -> bool:
-    ok = _run(
+def cmd_deploy_jekyll() -> bool:
+    return _run(
         [sys.executable, "scripts/deploy_jekyll.py"],
-        "Deploy - Copiando al repo Jekyll",
+        "Deploy Jekyll - Copiando al repo Jekyll",
     )
-    ok2 = _run(
-        ["Rscript", "deploy.R"],
-        "Deploy - Publicando dashboard a shinyapps.io",
+
+
+def cmd_deploy_shiny() -> bool:
+    return _run(
+        [_RSCRIPT, "deploy.R"],
+        "Deploy Shiny - Publicando dashboard a shinyapps.io",
     )
+
+
+def cmd_deploy() -> bool:
+    ok = cmd_deploy_jekyll()
+    ok2 = cmd_deploy_shiny()
     return ok and ok2
 
 
 def cmd_ver() -> bool:
     return _run(
-        ["Rscript", "-e", "shiny::runApp('dashboard')"],
+        [_RSCRIPT, "-e", "shiny::runApp('dashboard')"],
         "Ver - Ejecutando dashboard Shiny localmente",
     )
 
@@ -145,7 +178,9 @@ def cmd_help() -> None:
   python run.py {_green("extract")}      Extrae datos (Python)
   python run.py {_green("transform")}    Transforma datos (R)
   python run.py {_green("assets")}       Genera gráficos estáticos
-  python run.py {_green("deploy")}       Copia al Jekyll + publica a Shiny
+  python run.py {_green("deploy")}        Ambos deploys (Jekyll + Shiny)
+  python run.py {_green("deploy-shiny")}  Deploy dashboard a shinyapps.io
+  python run.py {_green("deploy-jekyll")} Copia archivos al repo Jekyll
   python run.py {_green("ver")}          Lanza dashboard Shiny local
   python run.py {_green("test")}         Ejecuta tests (pytest) + linting (ruff)
   python run.py {_green("all")}          Pipeline completo: extract -> transform -> assets -> deploy
@@ -161,6 +196,8 @@ COMMANDS = {
     "transform": lambda _: cmd_transform(),
     "assets": lambda _: cmd_assets(),
     "deploy": lambda _: cmd_deploy(),
+    "deploy-shiny": lambda _: cmd_deploy_shiny(),
+    "deploy-jekyll": lambda _: cmd_deploy_jekyll(),
     "ver": lambda _: cmd_ver(),
     "test": lambda _: cmd_test(),
     "all": lambda args: cmd_all(args),
