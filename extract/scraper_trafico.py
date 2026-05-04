@@ -79,7 +79,7 @@ def _normalize_trafico_csv(ruta: Path) -> pd.DataFrame:
     pax_col = _detect_col(norm_names, "pasajeros")
 
     if not ano_col or not mes_col:
-        logger.warning("CSV de trafico sin columnas de ano/mes: %s", ruta)
+        logger.warning("CSV de tráfico sin columnas de año/mes: %s", ruta)
         return pd.DataFrame()
 
     # Limpiar numéricas
@@ -152,7 +152,7 @@ def extraer_trafico(url: str, out_dir: Path, timeout: int = 30, session: request
     out_dir.mkdir(parents=True, exist_ok=True)
 
     export_url = _build_export_url(url)
-    logger.info("Descargando trafico aereo desde Google Sheets...")
+    logger.info("Descargando tráfico aéreo desde Google Sheets...")
     r = sess.get(export_url, timeout=timeout)
     r.raise_for_status()
 
@@ -164,19 +164,19 @@ def extraer_trafico(url: str, out_dir: Path, timeout: int = 30, session: request
     try:
         df = _normalize_trafico_csv(ruta_raw)
         if df.empty:
-            logger.warning("No se pudieron normalizar los datos de trafico")
+            logger.warning("No se pudieron normalizar los datos de tráfico")
             # Guardar tal cual como fallback
             ruta = out_dir / "trafico_aereo.csv"
             ruta.write_bytes(r.content)
             return ruta
     except Exception as e:
-        logger.warning("Error normalizando trafico, guardando CSV crudo: %s", e)
+        logger.warning("Error normalizando tráfico, guardando CSV crudo: %s", e)
         ruta = out_dir / "trafico_aereo.csv"
         ruta.write_bytes(r.content)
         return ruta
 
     ruta = out_dir / "trafico_aereo.csv"
     df.to_csv(ruta, index=False, encoding="utf-8")
-    logger.info("Trafico aereo normalizado: %s (%d filas, %d columnas)", ruta, len(df), len(df.columns))
+    logger.info("Tráfico aéreo normalizado: %s (%d filas, %d columnas)", ruta, len(df), len(df.columns))
 
     return ruta

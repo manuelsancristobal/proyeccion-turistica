@@ -91,7 +91,7 @@ def _parse_llegadas_excel(buf, sheet_name) -> pd.DataFrame:
     # 1. Detectar fila de años (p.ej. "2008", "2009", ...)
     year_row_idx = _find_year_row(df_raw)
     if year_row_idx is None:
-        logger.warning("No se encontro fila de años en hoja '%s'", sheet_name)
+        logger.warning("No se encontró fila de años en hoja '%s'", sheet_name)
         return pd.DataFrame()
 
     # 2. La fila de meses (ene, feb, ...) esta justo debajo
@@ -211,12 +211,12 @@ def extraer_llegadas(url: str, out_dir: Path, timeout: int = 15, session: reques
                 hojas_procesadas.add(sheet)
                 break
 
-    # Si no se encontraron hojas especificas, procesar todas
+    # Si no se encontraron hojas específicas, procesar todas
     if not generados:
         for i, sheet in enumerate(xls.sheet_names):
             if sheet in hojas_procesadas:
                 continue
-            logger.info("Procesando hoja '%s' (indice %d)", sheet, i)
+            logger.info("Procesando hoja '%s' (índice %d)", sheet, i)
             df = _parse_llegadas_excel(buf, sheet)
             if not df.empty:
                 nombre = re.sub(r"[^\w\s-]", "", sheet).strip().replace(" ", "_").lower()

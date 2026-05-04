@@ -87,7 +87,7 @@ def _run(cmd: list[str], label: str) -> bool:
     env["PYTHONPATH"] = _PROJECT_ROOT + os.pathsep + env.get("PYTHONPATH", "")
     result = subprocess.run(cmd, cwd=_PROJECT_ROOT, env=env)
     if result.returncode != 0:
-        print(f"\n{_red('X')} {label} fallo (exit code {result.returncode})")
+        print(f"\n{_red('X')} {label} falló (exit code {result.returncode})")
         return False
     print(f"\n{_green('OK')} {label}")
     return True
@@ -131,10 +131,21 @@ def cmd_deploy_shiny() -> bool:
     )
 
 
-def cmd_deploy() -> bool:
-    ok = cmd_deploy_jekyll()
-    ok2 = cmd_deploy_shiny()
-    return ok and ok2
+def cmd_deploy(args: list[str]) -> bool:
+    if not args:
+        ok = cmd_deploy_jekyll()
+        ok2 = cmd_deploy_shiny()
+        return ok and ok2
+
+    target = args[0].lower()
+    if target == "jekyll":
+        return cmd_deploy_jekyll()
+    if target == "shiny":
+        return cmd_deploy_shiny()
+
+    print(f"\n{_red('Error:')} Objetivo de deploy desconocido '{target}'")
+    print(f"Uso: python run.py deploy [{_green('jekyll')} | {_green('shiny')}]")
+    return False
 
 
 def cmd_ver() -> bool:
@@ -161,7 +172,7 @@ def cmd_all(args: list[str]) -> bool:
         ("extract", cmd_extract),
         ("transform", cmd_transform),
         ("assets", cmd_assets),
-        ("deploy", cmd_deploy),
+        ("deploy", lambda: cmd_deploy([])),
     ]
     for name, fn in steps:
         if not fn():
@@ -175,17 +186,17 @@ def cmd_help() -> None:
     print(f"""
 {_bold("Proyección Turística - Comandos disponibles")}
 
-  python run.py {_green("extract")}      Extrae datos (Python)
-  python run.py {_green("transform")}    Transforma datos (R)
-  python run.py {_green("assets")}       Genera gráficos estáticos
-  python run.py {_green("deploy")}        Ambos deploys (Jekyll + Shiny)
-  python run.py {_green("deploy-shiny")}  Deploy dashboard a shinyapps.io
-  python run.py {_green("deploy-jekyll")} Copia archivos al repo Jekyll
-  python run.py {_green("ver")}          Lanza dashboard Shiny local
-  python run.py {_green("test")}         Ejecuta tests (pytest) + linting (ruff)
-  python run.py {_green("all")}          Pipeline completo: extract -> transform -> assets -> deploy
+  python run.py {_green("extract")}           Extrae datos (Python)
+  python run.py {_green("transform")}         Transforma datos (R)
+  python run.py {_green("assets")}            Genera gráficos estáticos
+  python run.py {_green("deploy")}             Ambos deploys (Jekyll + Shiny)
+  python run.py {_green("deploy jekyll")}      Copia archivos al repo Jekyll
+  python run.py {_green("deploy shiny")}       Publica dashboard a shinyapps.io
+  python run.py {_green("ver")}               Lanza dashboard Shiny local
+  python run.py {_green("test")}              Ejecuta tests (pytest) + linting (ruff)
+  python run.py {_green("all")}               Pipeline completo: extract -> transform -> assets -> deploy
 
-{_yellow("Ejemplo:")} python run.py all
+{_yellow("Ejemplo:")} python run.py deploy jekyll
 """)
 
 
@@ -195,7 +206,7 @@ COMMANDS = {
     "extract": lambda _: cmd_extract(),
     "transform": lambda _: cmd_transform(),
     "assets": lambda _: cmd_assets(),
-    "deploy": lambda _: cmd_deploy(),
+    "deploy": lambda args: cmd_deploy(args),
     "deploy-shiny": lambda _: cmd_deploy_shiny(),
     "deploy-jekyll": lambda _: cmd_deploy_jekyll(),
     "ver": lambda _: cmd_ver(),

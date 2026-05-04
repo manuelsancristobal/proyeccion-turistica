@@ -77,3 +77,7 @@ Este proyecto implementa un ciclo de datos completo:
 - **Extracción** (Python): Descarga de forma automática desde SERNATUR y la Junta Aeronáutica Civil.
 - **Transformación** (R): Descomposición STL, modelos de pronóstico a 6 meses y cálculo de métricas de concentración de mercado.
 - **Visualización** (R Shiny): Interfaz con módulos para la analítica de mercados y flujos.
+
+<div class="methodology-box" style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-light); border-radius: 8px; border-left: 4px solid var(--secondary);">
+    <p style="margin: 0; font-size: 0.95rem;">📌 <strong>Sobre este proyecto:</strong> Esta es la versión rediseñada como aplicación interactiva. Los notebooks originales de 2022 están disponibles en Google Colab: <a href="https://colab.research.google.com/drive/1Is_3GIrlJLED5RO1xru1mXwDfVh3MRJG" target="_blank" style="color: var(--secondary); font-weight: 600;">Proyección 1</a> y <a href="https://colab.research.google.com/drive/1mnK0N87kra2KKewGlCh-VOCaK0boHSaW" target="_blank" style="color: var(--secondary); font-weight: 600;">Proyección 2</a>.</p>
+</div>

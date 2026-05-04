@@ -10,7 +10,7 @@ def load_config() -> dict:
     root = Path(__file__).resolve().parent.parent
     cfg_path = root / "config.yml"
     if not cfg_path.exists():
-        raise FileNotFoundError(f"No se encontro config.yml en {root}")
+        raise FileNotFoundError(f"No se encontró config.yml en {root}")
     with open(cfg_path, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
 

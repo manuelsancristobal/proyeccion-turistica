@@ -197,7 +197,7 @@ def clean_excel_wide_or_long(df_raw: pd.DataFrame) -> pd.DataFrame:
         logger.warning("Todas las filas quedaron con Fecha NaT.")
         return pd.DataFrame(columns=["Fecha", "Variable", "Cantidad"])
 
-    dfw["Variable"] = "Salidas por motivos turisticos"
+    dfw["Variable"] = "Salidas por motivos turísticos"
     return dfw[["Fecha", "Variable", "Cantidad"]]
 
 
@@ -227,7 +227,7 @@ def extraer_salidas(url: str, out_dir: Path, timeout: int = 15, session: request
     # Limpiar
     df_largo = clean_excel_wide_or_long(df_raw)
     if df_largo.empty:
-        logger.warning("No se obtuvieron datos validos del Excel de salidas.")
+        logger.warning("No se obtuvieron datos válidos del Excel de salidas.")
         return []
 
     codigo = _extraer_codigo_yymm_desde_url(url)

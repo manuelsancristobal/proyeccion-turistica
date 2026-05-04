@@ -148,7 +148,7 @@ def match_sheet_name(available: list, target=None, heuristic_keywords=None):
         for nm, nv in norm.items():
             if tgt in nv:
                 return nm
-        raise ValueError(f"No se encontro la hoja '{target}'. Hojas: {available}")
+        raise ValueError(f"No se encontró la hoja '{target}'. Hojas: {available}")
     # Heurística por keywords
     keywords = heuristic_keywords or ["datos", "serie", "hoja1"]
     norm = {nm: strip_accents_lower(nm) for nm in available}

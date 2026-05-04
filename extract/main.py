@@ -84,7 +84,7 @@ def main():
     trafico_url = sources.get("trafico_url", "")
     if trafico_url:
         logger.info("=" * 60)
-        logger.info("EXTRAYENDO: Trafico aereo")
+        logger.info("EXTRAYENDO: Tráfico aéreo")
         logger.info("URL: %s", trafico_url)
         try:
             ruta = extraer_trafico(
@@ -93,20 +93,20 @@ def main():
                 timeout=timeout,
                 session=session,
             )
-            logger.info("Trafico aereo: archivo generado en %s", ruta)
+            logger.info("Tráfico aéreo: archivo generado en %s", ruta)
             exitos += 1
         except Exception as e:
-            logger.error("ERROR extrayendo trafico aereo: %s", e)
+            logger.error("ERROR extrayendo tráfico aéreo: %s", e)
             errores += 1
     else:
-        logger.warning("No hay URL configurada para trafico aereo en config.yml")
+        logger.warning("No hay URL configurada para tráfico aéreo en config.yml")
 
     # --- Resumen ---
     logger.info("=" * 60)
-    logger.info("EXTRACT COMPLETADO: %d exitos, %d errores", exitos, errores)
+    logger.info("EXTRACT COMPLETADO: %d éxitos, %d errores", exitos, errores)
 
     if errores > 0:
-        logger.error("Hubo errores en la extraccion. Revisa las URLs en config.yml.")
+        logger.error("Hubo errores en la extracción. Revisa las URLs en config.yml.")
         sys.exit(1)
 
 
