@@ -1,24 +1,37 @@
-# Credenciales
+# Project Specific
 .Renviron
-.env
-
-# Deploy local
 rsconnect/
-
-# Configuración local de herramientas
-.claude/
-
-# Python
-.venv/
-__pycache__/
-*.pyc
-
-# Datos crudos (se descargan con el pipeline)
 data/raw/
+portfolio_charts/
 
-# OS
+### --- PROFESSIONAL STANDARDS ---
+
+# Environments & Secrets
+.env
+.venv/
+env/
+venv/
+*.env
+auth.json
+
+# AI Assistants
+.claude/
+.gemini/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating System
 .DS_Store
 Thumbs.db
 
-# Charts exportados (generados)
-portfolio_charts/
+# Project Specifics
+.coverage
+data/processed/
+data/work/
+output/
+__pycache__/
+*.py[cod]
