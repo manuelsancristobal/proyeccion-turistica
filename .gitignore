@@ -15,6 +15,7 @@ venv/
 auth.json
 
 # AI Assistants
+CLAUDE.md
 .claude/
 .gemini/
 
