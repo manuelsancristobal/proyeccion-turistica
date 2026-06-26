@@ -1,0 +1,31 @@
+# EditorConfig — estándar de formato del repositorio
+# https://editorconfig.org
+# Detiene la búsqueda hacia arriba en este archivo.
+root = true
+
+# Reglas base para todos los archivos.
+# Alineadas con los hooks de pre-commit (trailing-whitespace, end-of-file-fixer).
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Python: 4 espacios y límite de 120 caracteres (coincide con Ruff).
+[*.py]
+indent_size = 4
+max_line_length = 120
+
+# Activos web: 2 espacios (convención del proyecto).
+[*.{js,css,scss,html,json,yml,yaml}]
+indent_size = 2
+
+# R: 2 espacios (convención tidyverse).
+[*.R]
+indent_size = 2
+
+# Makefile: requiere tabulaciones reales, no espacios.
+[Makefile]
+indent_style = tab
